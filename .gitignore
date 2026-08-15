@@ -1,0 +1,47 @@
+# OS and editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Build and coverage output
+dist/
+build/
+coverage/
+.pytest_cache/
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+node_modules/
+
+# Terraform state and local working data
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+*.tfvars
+*.tfvars.json
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Terraform sensitive files
+.terraform.tfstate.lock.info
+
+# Azure CLI
+.azure/
+
+# Logs and temporary files
+*.log
+tmp/
+temp/
