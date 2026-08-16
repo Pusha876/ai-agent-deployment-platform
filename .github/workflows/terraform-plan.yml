@@ -3,6 +3,10 @@ name: Terraform Plan - DEV
 on:
   workflow_dispatch:
 
+concurrency:
+  group: terraform-plan-dev
+  cancel-in-progress: true
+
 permissions:
   id-token: write
   contents: read
@@ -36,10 +40,12 @@ jobs:
         run: terraform fmt -check -recursive
 
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -input=false -lock-timeout=60s
 
       - name: Terraform Validate
-        run: terraform validate
+        run: terraform validate -no-color
 
       - name: Terraform Plan
-        run: terraform plan
+        env:
+          TF_VAR_azure_subscription_id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+        run: terraform plan -input=false -lock-timeout=60s -no-color
