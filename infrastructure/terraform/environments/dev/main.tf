@@ -2,12 +2,11 @@
 #
 # Azure infrastructure will be added here
 # as reusable Terraform modules are introduced.
-terraform {
-  required_version = ">= 1.9.0"
-}
+module "monitoring" {
+  source = "../../modules/monitoring"
 
-module "dev" {
-  source = "../.."
-
-  azure_subscription_id = var.azure_subscription_id
+  name                = var.log_analytics_workspace_name
+  resource_group_name = var.resource_group_name
+  location            = var.location
+  retention_days      = 30
 }
