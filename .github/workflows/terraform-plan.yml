@@ -40,7 +40,7 @@ jobs:
         run: terraform fmt -check -recursive
 
       - name: Terraform Init
-        run: terraform init -input=false -lock-timeout=60s
+        run: terraform init -input=false -lock-timeout=10m
 
       - name: Terraform Validate
         run: terraform validate -no-color
@@ -48,4 +48,4 @@ jobs:
       - name: Terraform Plan
         env:
           TF_VAR_azure_subscription_id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-        run: terraform plan -input=false -lock-timeout=60s -no-color
+        run: terraform plan -input=false -lock-timeout=10m -no-color
