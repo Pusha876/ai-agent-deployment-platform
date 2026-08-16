@@ -4,8 +4,8 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: terraform-plan-dev
-  cancel-in-progress: true
+  group: terraform-dev
+  cancel-in-progress: false
 
 permissions:
   id-token: write

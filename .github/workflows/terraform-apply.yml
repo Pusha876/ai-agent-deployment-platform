@@ -3,6 +3,10 @@ name: Terraform Apply - DEV
 on:
   workflow_dispatch:
 
+concurrency:
+  group: terraform-dev
+  cancel-in-progress: false
+
 permissions:
   id-token: write
   contents: read
@@ -47,4 +51,4 @@ jobs:
         run: terraform plan -input=false -lock-timeout=60s -no-color -out=tfplan
 
       - name: Terraform Apply
-        run: terraform apply -input=false -auto-approve tfplan
+        run: terraform apply -input=false -lock-timeout=60s -auto-approve tfplan
