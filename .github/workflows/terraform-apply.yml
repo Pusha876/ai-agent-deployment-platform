@@ -32,14 +32,19 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -input=false -lock-timeout=60s
 
       - name: Terraform Validate
-        run: terraform validate
+        run: terraform validate -no-color
 
       - name: Terraform Plan
-        run: terraform plan -out=tfplan
+        env:
+          TF_VAR_azure_subscription_id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+        run: terraform plan -input=false -lock-timeout=60s -no-color -out=tfplan
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve tfplan
+        run: terraform apply -input=false -auto-approve tfplan
