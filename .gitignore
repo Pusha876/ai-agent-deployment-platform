@@ -44,3 +44,7 @@ override.tf.json
 *.log
 tmp/
 temp/
+
+# Power Platform
+*.zip
+.pac/

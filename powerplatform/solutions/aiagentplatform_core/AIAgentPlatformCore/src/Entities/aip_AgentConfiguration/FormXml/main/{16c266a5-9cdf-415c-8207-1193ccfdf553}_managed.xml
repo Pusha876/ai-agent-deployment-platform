@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<forms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <systemform>
+    <formid>{16c266a5-9cdf-415c-8207-1193ccfdf553}</formid>
+    <IntroducedVersion>1.0</IntroducedVersion>
+    <FormPresentation>1</FormPresentation>
+    <FormActivationState>1</FormActivationState>
+    <form>
+      <tabs>
+        <tab verticallayout="true" id="{0F5E7A4B-A1B7-4F0F-9120-70CC362DCFDD}" IsUserDefined="1">
+          <labels>
+            <label description="General" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section showlabel="false" showbar="false" IsUserDefined="0" id="{94A39DCF-44E0-4AFB-ABE1-FF316D926BD0}">
+                  <labels>
+                    <label description="General" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="{2991E504-B1E7-4B81-AAA3-516EDDE77923}">
+                        <labels>
+                          <label description="" languagecode="1033" />
+                        </labels>
+                        <control id="aip_agentname" classid="{4273EDBD-AC1D-40d3-9FB2-095C621B552D}" datafieldname="aip_AgentName" />
+                      </cell>
+                    </row>
+                    <row></row>
+                    <row>
+                      <cell id="{7ed258ed-f2fa-485e-91a8-6440d4693a84}">
+                        <labels>
+                          <label description="" languagecode="1033" />
+                        </labels>
+                        <control id="aip_agentkey" classid="{4273edbd-ac1d-40d3-9fb2-095c621b552d}" datafieldname="aip_agentkey" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{d7fc04fb-94e6-4d7d-b2e9-e6c0e0379b5d}">
+                        <labels>
+                          <label description="" languagecode="1033" />
+                        </labels>
+                        <control id="aip_environment" classid="{4273edbd-ac1d-40d3-9fb2-095c621b552d}" datafieldname="aip_environment" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{89fdfecc-5524-4f4f-9066-388968410241}">
+                        <labels>
+                          <label description="" languagecode="1033" />
+                        </labels>
+                        <control id="aip_enabled" classid="{67fac785-cd58-4f9f-abb3-4b7ddc6ed5ed}" datafieldname="aip_enabled" />
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+      </tabs>
+    </form>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>1</CanBeDeleted>
+    <LocalizedNames>
+      <LocalizedName description="Information" languagecode="1033" />
+    </LocalizedNames>
+    <Descriptions>
+      <Description description="A form for this entity." languagecode="1033" />
+    </Descriptions>
+  </systemform>
+</forms>
