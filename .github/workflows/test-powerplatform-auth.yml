@@ -1,0 +1,28 @@
+name: Power Platform OIDC Authentication Test
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  test-powerplatform-auth:
+    runs-on: ubuntu-latest
+
+    environment: dev
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Power Platform CLI
+        uses: microsoft/powerplatform-actions/actions-install@v1
+
+      - name: Test Power Platform Authentication
+        uses: microsoft/powerplatform-actions/who-am-i@v1
+        with:
+          environment-url: ${{ vars.POWER_PLATFORM_ENVIRONMENT_URL }}
+          app-id: ${{ vars.POWER_PLATFORM_CLIENT_ID }}
+          tenant-id: ${{ vars.POWER_PLATFORM_TENANT_ID }}
