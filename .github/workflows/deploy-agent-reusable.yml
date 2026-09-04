@@ -114,7 +114,7 @@ jobs:
           POWER_PLATFORM_CLIENT_SECRET: ${{ secrets.POWER_PLATFORM_CLIENT_SECRET }}
           POWER_PLATFORM_ENVIRONMENT_URL: ${{ vars.POWER_PLATFORM_ENVIRONMENT_URL }}
         run: |
-          pac auth create \
+          "$POWERPLATFORMTOOLS_PACPATH" auth create \
             --environment "$POWER_PLATFORM_ENVIRONMENT_URL" \
             --applicationId "$POWER_PLATFORM_CLIENT_ID" \
             --clientSecret "$POWER_PLATFORM_CLIENT_SECRET" \
@@ -125,7 +125,7 @@ jobs:
         env:
           POWER_PLATFORM_ENVIRONMENT_URL: ${{ vars.POWER_PLATFORM_ENVIRONMENT_URL }}
         run: |
-          pac solution import \
+          "$POWERPLATFORMTOOLS_PACPATH" solution import \
             --environment "$POWER_PLATFORM_ENVIRONMENT_URL" \
             --path "powerplatform/exports/AIAgentPlatformCore.zip" \
             --publish-changes
