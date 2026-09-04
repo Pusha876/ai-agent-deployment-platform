@@ -35,6 +35,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install validation dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.txt
+
+      - name: Validate agent configuration
+        run: |
+          python src/scripts/validate-agent-config.py \
+            "src/agent/${{ inputs.agent_name }}/agent.yaml"
+
       - name: Display deployment configuration
         run: |
           echo "========================================"
