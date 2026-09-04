@@ -1,0 +1,33 @@
+name: Reusable AI Agent Deployment
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: "Deployment environment"
+        required: true
+        type: string
+
+      agent_name:
+        description: "AI Agent name"
+        required: true
+        type: string
+
+jobs:
+  validate:
+    name: Validate deployment inputs
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Display deployment configuration
+        run: |
+          echo "========================================"
+          echo "AI Agent Deployment"
+          echo "========================================"
+          echo "Agent:        ${{ inputs.agent_name }}"
+          echo "Environment:  ${{ inputs.environment }}"
+          echo "========================================"
