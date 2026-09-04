@@ -13,3 +13,5 @@ jobs:
     with:
       environment: dev
       agent_name: ai-agent-platform
+      terraform_plan: true
+      deploy_powerplatform: true

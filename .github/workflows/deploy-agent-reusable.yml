@@ -13,6 +13,18 @@ on:
         required: true
         type: string
 
+      terraform_plan:
+        description: "Run Terraform plan"
+        required: false
+        default: true
+        type: boolean
+
+      deploy_powerplatform:
+        description: "Deploy Power Platform solution"
+        required: false
+        default: true
+        type: boolean
+
 jobs:
   validate:
     name: Validate deployment inputs
@@ -59,6 +71,7 @@ jobs:
 
   terraform:
     name: Terraform Plan
+    if: ${{ inputs.terraform_plan }}
     needs: validate
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
@@ -95,6 +108,7 @@ jobs:
 
   powerplatform:
     name: Deploy Power Platform Solution
+    if: ${{ inputs.deploy_powerplatform }}
     needs: validate
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
@@ -118,3 +132,25 @@ jobs:
           tenant-id: ${{ vars.POWER_PLATFORM_TENANT_ID }}
           solution-file: "powerplatform/exports/AIAgentPlatformCore.zip"
           publish-changes: true
+
+  deployment-summary:
+    name: Deployment Summary
+    if: ${{ always() }}
+    needs:
+      - validate
+      - terraform
+      - powerplatform
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deployment summary
+        run: |
+          echo "========================================"
+          echo "AI AGENT DEPLOYMENT SUMMARY"
+          echo "========================================"
+          echo "Agent:        ${{ inputs.agent_name }}"
+          echo "Environment:  ${{ inputs.environment }}"
+          echo "========================================"
+          echo "Terraform:    ${{ needs.terraform.result }}"
+          echo "Power Platform: ${{ needs.powerplatform.result }}"
+          echo "========================================"
