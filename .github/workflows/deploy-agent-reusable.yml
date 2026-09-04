@@ -92,3 +92,40 @@ jobs:
       - name: Terraform Plan
         working-directory: infrastructure/terraform
         run: terraform plan
+
+  powerplatform:
+    name: Deploy Power Platform Solution
+    needs: validate
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Power Platform CLI
+        uses: microsoft/powerplatform-actions/actions-install@v1
+
+      - name: Authenticate to Power Platform
+        shell: bash
+        env:
+          POWER_PLATFORM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+          POWER_PLATFORM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+          POWER_PLATFORM_CLIENT_SECRET: ${{ secrets.POWER_PLATFORM_CLIENT_SECRET }}
+          POWER_PLATFORM_ENVIRONMENT_URL: ${{ vars.POWER_PLATFORM_ENVIRONMENT_URL }}
+        run: |
+          pac auth create \
+            --environment "$POWER_PLATFORM_ENVIRONMENT_URL" \
+            --applicationId "$POWER_PLATFORM_CLIENT_ID" \
+            --clientSecret "$POWER_PLATFORM_CLIENT_SECRET" \
+            --tenant "$POWER_PLATFORM_TENANT_ID"
+
+      - name: Import Power Platform solution
+        shell: bash
+        env:
+          POWER_PLATFORM_ENVIRONMENT_URL: ${{ vars.POWER_PLATFORM_ENVIRONMENT_URL }}
+        run: |
+          pac solution import \
+            --environment "$POWER_PLATFORM_ENVIRONMENT_URL" \
+            --path "powerplatform/exports/AIAgentPlatformCore.zip" \
+            --publish-changes
