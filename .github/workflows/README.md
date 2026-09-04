@@ -13,6 +13,22 @@ Both workflows use Azure OIDC authentication and the `dev` GitHub environment. T
 - `AZURE_TENANT_ID`
 - `AZURE_SUBSCRIPTION_ID`
 
+## Deploy Agent workflows
+
+`deploy-agent-reusable.yml` (invoked by `deploy-agent-dev.yml`) authenticates to
+Power Platform using GitHub OIDC federated credentials, so no client secret is
+required or read from `secrets`. The calling workflow and the
+`powerplatform` job need `permissions: id-token: write`, and the environment
+must provide these repository or environment variables:
+
+- `POWER_PLATFORM_CLIENT_ID`
+- `POWER_PLATFORM_TENANT_ID`
+- `POWER_PLATFORM_ENVIRONMENT_URL`
+
+The app registration referenced by `POWER_PLATFORM_CLIENT_ID` must have a
+federated credential trusting this repository's GitHub Actions OIDC issuer
+(the same setup validated by `test-powerplatform-auth.yml`).
+
 ## Running Terraform locally
 
 The DEV provider requires `azure_subscription_id`; it has no default value. The GitHub workflows provide it through `TF_VAR_azure_subscription_id`, but a local `terraform plan` will prompt for it unless you provide the variable yourself.

@@ -99,6 +99,10 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
 
+    permissions:
+      id-token: write
+      contents: read
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -106,26 +110,11 @@ jobs:
       - name: Install Power Platform CLI
         uses: microsoft/powerplatform-actions/actions-install@v1
 
-      - name: Authenticate to Power Platform
-        shell: bash
-        env:
-          POWER_PLATFORM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
-          POWER_PLATFORM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
-          POWER_PLATFORM_CLIENT_SECRET: ${{ secrets.POWER_PLATFORM_CLIENT_SECRET }}
-          POWER_PLATFORM_ENVIRONMENT_URL: ${{ vars.POWER_PLATFORM_ENVIRONMENT_URL }}
-        run: |
-          "$POWERPLATFORMTOOLS_PACPATH" auth create \
-            --environment "$POWER_PLATFORM_ENVIRONMENT_URL" \
-            --applicationId "$POWER_PLATFORM_CLIENT_ID" \
-            --clientSecret "$POWER_PLATFORM_CLIENT_SECRET" \
-            --tenant "$POWER_PLATFORM_TENANT_ID"
-
       - name: Import Power Platform solution
-        shell: bash
-        env:
-          POWER_PLATFORM_ENVIRONMENT_URL: ${{ vars.POWER_PLATFORM_ENVIRONMENT_URL }}
-        run: |
-          "$POWERPLATFORMTOOLS_PACPATH" solution import \
-            --environment "$POWER_PLATFORM_ENVIRONMENT_URL" \
-            --path "powerplatform/exports/AIAgentPlatformCore.zip" \
-            --publish-changes
+        uses: microsoft/powerplatform-actions/import-solution@v1
+        with:
+          environment-url: ${{ vars.POWER_PLATFORM_ENVIRONMENT_URL }}
+          app-id: ${{ vars.POWER_PLATFORM_CLIENT_ID }}
+          tenant-id: ${{ vars.POWER_PLATFORM_TENANT_ID }}
+          solution-file: "powerplatform/exports/AIAgentPlatformCore.zip"
+          publish-changes: true
