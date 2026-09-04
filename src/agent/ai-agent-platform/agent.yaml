@@ -1,0 +1,13 @@
+agent:
+  name: ai-agent-platform
+  display_name: AI Agent Platform
+  environment: dev
+
+azure:
+  resource_group: rg-aiagent-dev-eastus
+
+powerplatform:
+  solution: AIAgentPlatformCore
+
+deployment:
+  enabled: true
