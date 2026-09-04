@@ -1,0 +1,11 @@
+name: Deploy Agent - DEV
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/deploy-agent-reusable.yml
+    with:
+      environment: dev
+      agent_name: ai-agent-platform
