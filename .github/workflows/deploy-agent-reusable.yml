@@ -158,7 +158,14 @@ jobs:
 
       - name: Terraform Plan
         working-directory: infrastructure/terraform
-        run: terraform plan
+        run: |
+          terraform plan \
+            -var="agent_resource_group=${{ needs.validate.outputs.resource_group }}"
+      - name: Display agent Terraform configuration
+        run: |
+          echo "Agent: ${{ needs.validate.outputs.agent_name }}"
+          echo "Environment: ${{ needs.validate.outputs.agent_environment }}"
+          echo "Resource Group: ${{ needs.validate.outputs.resource_group }}"
 
   powerplatform:
     name: Deploy Power Platform Solution
