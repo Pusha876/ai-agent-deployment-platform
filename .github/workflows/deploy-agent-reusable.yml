@@ -48,7 +48,8 @@ jobs:
       - name: Validate agent configuration
         run: |
           python src/scripts/validate-agent-config.py \
-            "src/agent/${{ inputs.agent_name }}/agent.yaml"
+            "src/agent/${{ inputs.agent_name }}/agent.yaml" \
+            "${{ inputs.environment }}"
 
       - name: Display deployment configuration
         run: |

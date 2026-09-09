@@ -17,11 +17,15 @@ REQUIRED_FIELDS = [
 
 
 def main():
-    if len(sys.argv) != 2:
-        print("Usage: validate-agent-config.py <agent.yaml>")
+    if len(sys.argv) not in (2, 3):
+        print(
+            "Usage: validate-agent-config.py <agent.yaml> "
+            "[deployment_environment]"
+        )
         sys.exit(1)
 
     config_path = Path(sys.argv[1])
+    deployment_environment = sys.argv[2] if len(sys.argv) == 3 else None
 
     if not config_path.is_file():
         print(f"ERROR: Configuration file not found: {config_path}")
@@ -54,17 +58,42 @@ def main():
 
     if errors:
         print("Agent configuration validation FAILED:")
+
         for error in errors:
             print(f"  - {error}")
 
         sys.exit(1)
 
+    agent_environment = config["agent"]["environment"]
+
+    if deployment_environment:
+        if agent_environment != deployment_environment:
+            print("Agent configuration validation FAILED:")
+            print(
+                f"  - Agent environment '{agent_environment}' "
+                f"does not match deployment environment "
+                f"'{deployment_environment}'"
+            )
+            sys.exit(1)
+
+    deployment_enabled = config["deployment"]["enabled"]
+
+    if not isinstance(deployment_enabled, bool):
+        print("Agent configuration validation FAILED:")
+        print("  - deployment.enabled must be true or false")
+        sys.exit(1)
+
+    if not deployment_enabled:
+        print("Agent configuration validation FAILED:")
+        print("  - Agent deployment is disabled")
+        sys.exit(1)
+
     print("Agent configuration validation PASSED.")
-    print(f"Agent:        {config['agent']['name']}")
-    print(f"Display Name: {config['agent']['display_name']}")
-    print(f"Environment:  {config['agent']['environment']}")
-    print(f"Resource Group: {config['azure']['resource_group']}")
-    print(f"Solution:     {config['powerplatform']['solution']}")
+    print(f"Agent:              {config['agent']['name']}")
+    print(f"Display Name:       {config['agent']['display_name']}")
+    print(f"Environment:        {agent_environment}")
+    print(f"Resource Group:     {config['azure']['resource_group']}")
+    print(f"Solution:           {config['powerplatform']['solution']}")
     print(f"Deployment Enabled: {config['deployment']['enabled']}")
 
 
