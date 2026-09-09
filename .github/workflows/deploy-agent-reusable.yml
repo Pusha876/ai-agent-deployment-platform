@@ -150,16 +150,18 @@ jobs:
 
       - name: Terraform Init
         working-directory: infrastructure/terraform/environments/${{ inputs.environment }}
-        run: terraform init
+        run: terraform init -input=false -lock-timeout=60s
 
       - name: Terraform Validate
         working-directory: infrastructure/terraform/environments/${{ inputs.environment }}
-        run: terraform validate
+        run: terraform validate -no-color
 
       - name: Terraform Plan
         working-directory: infrastructure/terraform/environments/${{ inputs.environment }}
+        env:
+          TF_VAR_azure_subscription_id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
         run: |
-          terraform plan \
+          terraform plan -input=false -lock-timeout=60s -no-color \
             -var="agent_resource_group=${{ needs.validate.outputs.resource_group }}"
       - name: Display agent Terraform configuration
         run: |
