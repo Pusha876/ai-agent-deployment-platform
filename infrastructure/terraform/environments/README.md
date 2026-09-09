@@ -26,3 +26,28 @@ with:
 3. Open the printed URL, enter the device code, and select the correct
    subscription when prompted.
 4. Re-run the Terraform command.
+
+## Troubleshooting: Stuck Terraform state lock
+
+If `terraform init`/`plan` fails with:
+
+```
+Error: Error acquiring the state lock
+
+Error message: state blob is already locked
+Lock Info:
+  ID:        <lock-id>
+  Path:      tfstate/ai-agent-platform/<env>/terraform.tfstate
+  Operation: OperationTypePlan
+```
+
+this usually means a previous run (e.g. a cancelled or hung GitHub Actions
+workflow) never released its lock on the state blob. Confirm no other
+Terraform operation is genuinely still running against that state, then
+release the stale lock:
+
+```
+terraform force-unlock -force <lock-id>
+```
+
+Re-run the Terraform command afterward.
