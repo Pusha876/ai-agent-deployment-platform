@@ -20,3 +20,8 @@ variable "log_analytics_workspace_name" {
   type        = string
   default     = "law-aiagent-dev-eastus"
 }
+
+variable "agent_resource_group" {
+  description = "Azure resource group associated with the AI agent deployment."
+  type        = string
+}
