@@ -31,6 +31,13 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
 
+    outputs:
+      agent_name: ${{ steps.agent-config.outputs.agent_name }}
+      agent_display_name: ${{ steps.agent-config.outputs.agent_display_name }}
+      agent_environment: ${{ steps.agent-config.outputs.environment }}
+      resource_group: ${{ steps.agent-config.outputs.resource_group }}
+      solution: ${{ steps.agent-config.outputs.solution }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -50,6 +57,37 @@ jobs:
           python src/scripts/validate-agent-config.py \
             "src/agent/${{ inputs.agent_name }}/agent.yaml" \
             "${{ inputs.environment }}"
+
+      - name: Load agent configuration
+        id: agent-config
+        run: |
+          python - <<'PY'
+          import os
+          import yaml
+
+          path = "src/agent/${{ inputs.agent_name }}/agent.yaml"
+
+          with open(path, "r", encoding="utf-8") as file:
+              config = yaml.safe_load(file)
+
+          agent = config["agent"]
+          azure = config["azure"]
+          powerplatform = config["powerplatform"]
+
+          output = os.environ["GITHUB_OUTPUT"]
+
+          with open(output, "a", encoding="utf-8") as file:
+              file.write(f"agent_name={agent['name']}\n")
+              file.write(f"agent_display_name={agent['display_name']}\n")
+              file.write(f"environment={agent['environment']}\n")
+              file.write(f"resource_group={azure['resource_group']}\n")
+              file.write(f"solution={powerplatform['solution']}\n")
+
+          print(f"Loaded configuration for {agent['display_name']}")
+          print(f"Environment: {agent['environment']}")
+          print(f"Resource Group: {azure['resource_group']}")
+          print(f"Solution: {powerplatform['solution']}")
+          PY
 
       - name: Display deployment configuration
         run: |
