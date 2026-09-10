@@ -1,0 +1,17 @@
+name: Deploy Sample Agent - DEV
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/deploy-agent-reusable.yml
+    with:
+      environment: dev
+      agent_name: sample-agent
+      terraform_plan: true
+      deploy_powerplatform: true

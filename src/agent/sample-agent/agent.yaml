@@ -1,0 +1,13 @@
+agent:
+  name: sample-agent
+  display_name: Sample AI Agent
+  environment: dev
+
+azure:
+  resource_group: rg-aiagent-dev-eastus
+
+powerplatform:
+  solution: AIAgentPlatformCore
+
+deployment:
+  enabled: true
