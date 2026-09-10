@@ -223,3 +223,10 @@ jobs:
           echo "Terraform:    ${{ needs.terraform.result }}"
           echo "Power Platform: ${{ needs.powerplatform.result }}"
           echo "========================================"
+          if [[ "${{ inputs.terraform_plan }}" == "false" || "${{ needs.terraform.result }}" == "success" ]] && \
+             [[ "${{ inputs.deploy_powerplatform }}" == "false" || "${{ needs.powerplatform.result }}" == "success" ]]; then
+            echo "Overall Status:     SUCCESS"
+          else
+            echo "Overall Status:     FAILED"
+            exit 1
+          fi
