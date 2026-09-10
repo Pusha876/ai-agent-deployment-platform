@@ -6,7 +6,7 @@ module "monitoring" {
   source = "../../modules/monitoring"
 
   name                = var.log_analytics_workspace_name
-  resource_group_name = var.resource_group_name
+  resource_group_name = var.agent_resource_group
   location            = var.location
   retention_days      = 30
 }

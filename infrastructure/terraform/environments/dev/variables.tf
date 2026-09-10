@@ -3,10 +3,9 @@ variable "azure_subscription_id" {
   type        = string
 }
 
-variable "resource_group_name" {
-  description = "AI Agent DEV resource group"
+variable "agent_resource_group" {
+  description = "Azure resource group associated with the AI agent deployment."
   type        = string
-  default     = "rg-aiagent-dev-eastus"
 }
 
 variable "location" {
@@ -19,9 +18,4 @@ variable "log_analytics_workspace_name" {
   description = "DEV Log Analytics workspace name"
   type        = string
   default     = "law-aiagent-dev-eastus"
-}
-
-variable "agent_resource_group" {
-  description = "Azure resource group associated with the AI agent deployment."
-  type        = string
 }
