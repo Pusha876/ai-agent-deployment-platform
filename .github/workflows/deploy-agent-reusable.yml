@@ -187,13 +187,19 @@ jobs:
       - name: Install Power Platform CLI
         uses: microsoft/powerplatform-actions/actions-install@v1
 
+      - name: Display Power Platform configuration
+        run: |
+          echo "Agent: ${{ needs.validate.outputs.agent_name }}"
+          echo "Power Platform Solution: ${{ needs.validate.outputs.solution }}"
+          echo "Solution Package: powerplatform/exports/${{ needs.validate.outputs.solution }}.zip"
+
       - name: Import Power Platform solution
         uses: microsoft/powerplatform-actions/import-solution@v1
         with:
           environment-url: ${{ vars.POWER_PLATFORM_ENVIRONMENT_URL }}
           app-id: ${{ vars.POWER_PLATFORM_CLIENT_ID }}
           tenant-id: ${{ vars.POWER_PLATFORM_TENANT_ID }}
-          solution-file: "powerplatform/exports/AIAgentPlatformCore.zip"
+          solution-file: "powerplatform/exports/${{ needs.validate.outputs.solution }}.zip"
           publish-changes: true
 
   deployment-summary:
