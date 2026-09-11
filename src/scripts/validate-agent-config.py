@@ -75,14 +75,14 @@ def main():
         sys.exit(1)
 
     print("Agent configuration validation PASSED.")
-    print(f"Agent:              {config['agent']['name']}")
-    print(f"Display Name:       {config['agent']['display_name']}")
+    print(f"Agent:                   {config['agent']['name']}")
+    print(f"Display Name:            {config['agent']['display_name']}")
 
     if deployment_environment:
-        print(f"Deployment Environment: {deployment_environment}")
+        print(f"Deployment Environment:  {deployment_environment}")
 
-    print(f"Solution:           {config['powerplatform']['solution']}")
-    print(f"Deployment Enabled: {config['deployment']['enabled']}")
+    print(f"Solution:                {config['powerplatform']['solution']}")
+    print(f"Deployment Enabled:      {config['deployment']['enabled']}")
 
 
 if __name__ == "__main__":
