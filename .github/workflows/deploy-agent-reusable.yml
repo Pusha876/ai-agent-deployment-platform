@@ -34,8 +34,6 @@ jobs:
     outputs:
       agent_name: ${{ steps.agent-config.outputs.agent_name }}
       agent_display_name: ${{ steps.agent-config.outputs.agent_display_name }}
-      agent_environment: ${{ steps.agent-config.outputs.environment }}
-      resource_group: ${{ steps.agent-config.outputs.resource_group }}
       solution: ${{ steps.agent-config.outputs.solution }}
 
     steps:
@@ -71,7 +69,6 @@ jobs:
               config = yaml.safe_load(file)
 
           agent = config["agent"]
-          azure = config["azure"]
           powerplatform = config["powerplatform"]
 
           output = os.environ["GITHUB_OUTPUT"]
@@ -79,13 +76,9 @@ jobs:
           with open(output, "a", encoding="utf-8") as file:
               file.write(f"agent_name={agent['name']}\n")
               file.write(f"agent_display_name={agent['display_name']}\n")
-              file.write(f"environment={agent['environment']}\n")
-              file.write(f"resource_group={azure['resource_group']}\n")
               file.write(f"solution={powerplatform['solution']}\n")
 
           print(f"Loaded configuration for {agent['display_name']}")
-          print(f"Environment: {agent['environment']}")
-          print(f"Resource Group: {azure['resource_group']}")
           print(f"Solution: {powerplatform['solution']}")
           PY
 
@@ -162,12 +155,12 @@ jobs:
           TF_VAR_azure_subscription_id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
         run: |
           terraform plan -input=false -lock-timeout=60s -no-color \
-            -var="agent_resource_group=${{ needs.validate.outputs.resource_group }}"
+            -var="agent_resource_group=${{ vars.AZURE_RESOURCE_GROUP }}"
       - name: Display agent Terraform configuration
         run: |
           echo "Agent: ${{ needs.validate.outputs.agent_name }}"
-          echo "Environment: ${{ needs.validate.outputs.agent_environment }}"
-          echo "Resource Group: ${{ needs.validate.outputs.resource_group }}"
+          echo "Environment: ${{ inputs.environment }}"
+          echo "Resource Group: ${{ vars.AZURE_RESOURCE_GROUP }}"
 
   powerplatform:
     name: Deploy Power Platform Solution
