@@ -9,8 +9,6 @@ import yaml
 REQUIRED_FIELDS = [
     ("agent", "name"),
     ("agent", "display_name"),
-    ("agent", "environment"),
-    ("azure", "resource_group"),
     ("powerplatform", "solution"),
     ("deployment", "enabled"),
 ]
@@ -64,18 +62,6 @@ def main():
 
         sys.exit(1)
 
-    agent_environment = config["agent"]["environment"]
-
-    if deployment_environment:
-        if agent_environment != deployment_environment:
-            print("Agent configuration validation FAILED:")
-            print(
-                f"  - Agent environment '{agent_environment}' "
-                f"does not match deployment environment "
-                f"'{deployment_environment}'"
-            )
-            sys.exit(1)
-
     deployment_enabled = config["deployment"]["enabled"]
 
     if not isinstance(deployment_enabled, bool):
@@ -91,8 +77,10 @@ def main():
     print("Agent configuration validation PASSED.")
     print(f"Agent:              {config['agent']['name']}")
     print(f"Display Name:       {config['agent']['display_name']}")
-    print(f"Environment:        {agent_environment}")
-    print(f"Resource Group:     {config['azure']['resource_group']}")
+
+    if deployment_environment:
+        print(f"Deployment Environment: {deployment_environment}")
+
     print(f"Solution:           {config['powerplatform']['solution']}")
     print(f"Deployment Enabled: {config['deployment']['enabled']}")
 
