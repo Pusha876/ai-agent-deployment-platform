@@ -48,6 +48,7 @@ jobs:
       - name: Terraform Plan
         env:
           TF_VAR_azure_subscription_id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          TF_VAR_agent_resource_group: ${{ vars.AZURE_RESOURCE_GROUP }}
         run: terraform plan -input=false -lock-timeout=60s -no-color -out=tfplan
 
       - name: Terraform Apply
