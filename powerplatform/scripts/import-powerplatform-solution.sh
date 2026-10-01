@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-repository_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+repository_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 solution_path="${POWER_PLATFORM_SOLUTION_PATH:-$repository_root/powerplatform/solutions/aiagentplatform_core/AIAgentPlatformCore/bin/Debug/AIAgentPlatformCore.zip}"
 environment_url="${POWER_PLATFORM_ENVIRONMENT_URL:-https://aiagenttest.crm.dynamics.com/}"
 
