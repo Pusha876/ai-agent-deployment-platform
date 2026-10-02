@@ -2,6 +2,9 @@ agent:
   name: ai-agent-platform
   display_name: AI Agent Platform
 
+azure:
+  resource_group: REPLACE_WITH_RESOURCE_GROUP
+
 powerplatform:
   solution: AIAgentPlatformCore
 

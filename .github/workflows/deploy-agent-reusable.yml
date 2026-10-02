@@ -70,6 +70,7 @@ jobs:
               config = yaml.safe_load(file)
 
           agent = config["agent"]
+          azure = config["azure"]
           powerplatform = config["powerplatform"]
 
           output = os.environ["GITHUB_OUTPUT"]
