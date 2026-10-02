@@ -34,6 +34,7 @@ jobs:
     outputs:
       agent_name: ${{ steps.agent-config.outputs.agent_name }}
       agent_display_name: ${{ steps.agent-config.outputs.agent_display_name }}
+      resource_group: ${{ steps.agent-config.outputs.resource_group }}
       solution: ${{ steps.agent-config.outputs.solution }}
 
     steps:
@@ -76,11 +77,27 @@ jobs:
           with open(output, "a", encoding="utf-8") as file:
               file.write(f"agent_name={agent['name']}\n")
               file.write(f"agent_display_name={agent['display_name']}\n")
+              file.write(f"resource_group={azure['resource_group']}\n")
               file.write(f"solution={powerplatform['solution']}\n")
 
           print(f"Loaded configuration for {agent['display_name']}")
           print(f"Solution: {powerplatform['solution']}")
           PY
+
+      - name: Validate Azure resource group
+        env:
+          AGENT_RESOURCE_GROUP: ${{ steps.agent-config.outputs.resource_group }}
+          ENVIRONMENT_RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
+        run: |
+          echo "Agent resource group:       $AGENT_RESOURCE_GROUP"
+          echo "Environment resource group: $ENVIRONMENT_RESOURCE_GROUP"
+
+          if [[ "$AGENT_RESOURCE_GROUP" != "$ENVIRONMENT_RESOURCE_GROUP" ]]; then
+            echo "ERROR: Agent resource group does not match the deployment environment."
+            exit 1
+          fi
+
+          echo "Azure resource group validation PASSED."
 
       - name: Display deployment configuration
         run: |
