@@ -1,0 +1,56 @@
+name: Discover AI Agents
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  discover:
+    name: Discover agents
+    runs-on: ubuntu-latest
+
+    outputs:
+      agents: ${{ steps.agents.outputs.agents }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Discover agent configurations
+        id: agents
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          agents=""
+
+          for config in src/agent/*/agent.yaml; do
+            if [[ -f "$config" ]]; then
+              agent_name="$(basename "$(dirname "$config")")"
+
+              if [[ -n "$agents" ]]; then
+                agents="${agents},"
+              fi
+
+              agents="${agents}\"${agent_name}\""
+            fi
+          done
+
+          if [[ -z "$agents" ]]; then
+            echo "ERROR: No agent configurations found."
+            exit 1
+          fi
+
+          matrix="[${agents}]"
+
+          echo "Discovered agents:"
+          echo "$matrix"
+
+          echo "agents=$matrix" >> "$GITHUB_OUTPUT"
+
+      - name: Display discovered agents
+        run: |
+          echo "Agents discovered:"
+          echo '${{ steps.agents.outputs.agents }}'
