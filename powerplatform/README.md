@@ -37,6 +37,8 @@ export POWER_PLATFORM_TENANT_ID="<tenant-that-owns-aiagentdev>"
 
 In GitHub Actions, map the environment secret to
 `POWER_PLATFORM_CLIENT_SECRET` and provide the other values as environment
-variables or repository/environment variables. The service principal must be
-registered as an application user in the target Dataverse environment with a
-security role that permits solution import.
+variables or repository/environment variables. For solution imports, register
+the service principal as an application user in the target Dataverse
+environment and assign it the built-in **System Customizer** security role.
+System Administrator is not required. Successful OIDC authentication alone
+does not grant the application user permission to import solutions.
