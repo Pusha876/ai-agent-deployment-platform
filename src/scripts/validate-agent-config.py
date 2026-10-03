@@ -81,6 +81,8 @@ def main():
     if deployment_environment:
         print(f"Deployment Environment:  {deployment_environment}")
 
+    print("Environment:        deployment-controlled")
+    print("Resource Group:     deployment-controlled")
     print(f"Solution:                {config['powerplatform']['solution']}")
     print(f"Deployment Enabled:      {config['deployment']['enabled']}")
 
