@@ -57,6 +57,8 @@ jobs:
 
     strategy:
       fail-fast: false
+      # Agents share one Power Platform solution; concurrent imports are rejected.
+      max-parallel: 1
       matrix:
         agent: ${{ fromJSON(needs.discover.outputs.agents) }}
 
