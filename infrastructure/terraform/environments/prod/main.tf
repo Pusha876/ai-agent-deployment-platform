@@ -1,5 +1,11 @@
 # AI Agent Platform - PROD
 
+# The prod resource group was created outside Terraform; adopt it into state.
+import {
+  to = azurerm_resource_group.agent
+  id = "/subscriptions/${var.azure_subscription_id}/resourceGroups/${var.agent_resource_group}"
+}
+
 resource "azurerm_resource_group" "agent" {
   name     = var.agent_resource_group
   location = var.location
