@@ -74,8 +74,11 @@ jobs:
           cp -R docs "release/${ARTIFACT_NAME}/"
           cp -R infrastructure "release/${ARTIFACT_NAME}/"
           cp -R powerplatform "release/${ARTIFACT_NAME}/"
-          cp -R scripts "release/${ARTIFACT_NAME}/"
           cp -R src "release/${ARTIFACT_NAME}/"
+
+          if [[ -d "scripts" ]]; then
+            cp -R scripts "release/${ARTIFACT_NAME}/"
+          fi
 
           if [[ -d "tests" ]]; then
             cp -R tests "release/${ARTIFACT_NAME}/"
