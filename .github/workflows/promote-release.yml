@@ -83,6 +83,69 @@ jobs:
 
           echo "SHA256 verification PASSED."
 
+  deploy-release:
+    name: Deploy Verified Release
+    needs: download-release
+    runs-on: ubuntu-latest
+
+    environment: ${{ inputs.environment }}
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Download release archive
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p release
+
+          gh release download "${{ inputs.version }}" \
+            --repo "${{ github.repository }}" \
+            --pattern "*.zip" \
+            --pattern "*.sha256" \
+            --dir release
+
+      - name: Verify release artifact
+        working-directory: release
+        run: |
+          sha256sum -c *.sha256
+
+          echo "Release artifact verified."
+          ls -lh
+
+      - name: Extract release artifact
+        run: |
+          mkdir -p artifact
+
+          unzip -q release/*.zip -d artifact
+
+          echo "Release artifact extracted:"
+          find artifact -maxdepth 3 -type f | sort
+
+      - name: Verify Power Platform solution exists
+        run: |
+          SOLUTION="artifact/powerplatform/exports/AIAgentPlatformCore.zip"
+
+          if [[ ! -f "$SOLUTION" ]]; then
+            echo "ERROR: Power Platform solution not found:"
+            echo "$SOLUTION"
+            exit 1
+          fi
+
+          echo "Power Platform solution found:"
+          ls -lh "$SOLUTION"
+
+      - name: Display deployment target
+        run: |
+          echo "========================================"
+          echo "DEPLOYING RELEASE"
+          echo "========================================"
+          echo "Version:     ${{ inputs.version }}"
+          echo "Environment: ${{ inputs.environment }}"
+          echo "========================================"
+
   promotion-summary:
     name: Promotion Summary
     if: ${{ always() }}
