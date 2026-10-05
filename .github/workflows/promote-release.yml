@@ -161,6 +161,17 @@ jobs:
           solution-file: ${{ steps.solution.outputs.path }}
           publish-changes: true
 
+      - name: Deployment summary
+        run: |
+          echo "========================================"
+          echo "RELEASE DEPLOYMENT SUMMARY"
+          echo "========================================"
+          echo "Release:     ${{ inputs.version }}"
+          echo "Environment: ${{ inputs.environment }}"
+          echo "========================================"
+          echo "Artifact:    Verified GitHub Release"
+          echo "========================================"
+
   promotion-summary:
     name: Promotion Summary
     if: ${{ always() }}
