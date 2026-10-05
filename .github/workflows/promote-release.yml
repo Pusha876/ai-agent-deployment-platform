@@ -125,6 +125,7 @@ jobs:
           find artifact -maxdepth 3 -type f | sort
 
       - name: Verify Power Platform solution exists
+        id: solution
         run: |
           # The release archive nests content under ai-agent-deployment-platform-vX.Y.Z/
           SOLUTION="$(find artifact -maxdepth 4 -type f -path '*/powerplatform/exports/AIAgentPlatformCore.zip' | head -n 1)"
@@ -136,6 +137,8 @@ jobs:
 
           echo "Power Platform solution found:"
           ls -lh "$SOLUTION"
+
+          echo "path=$SOLUTION" >> "$GITHUB_OUTPUT"
 
       - name: Display deployment target
         run: |
@@ -155,7 +158,7 @@ jobs:
           environment-url: ${{ vars.POWER_PLATFORM_ENVIRONMENT_URL }}
           app-id: ${{ vars.POWER_PLATFORM_CLIENT_ID }}
           tenant-id: ${{ vars.POWER_PLATFORM_TENANT_ID }}
-          solution-file: "artifact/powerplatform/exports/AIAgentPlatformCore.zip"
+          solution-file: ${{ steps.solution.outputs.path }}
           publish-changes: true
 
   promotion-summary:
