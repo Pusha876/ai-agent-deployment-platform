@@ -126,11 +126,11 @@ jobs:
 
       - name: Verify Power Platform solution exists
         run: |
-          SOLUTION="artifact/powerplatform/exports/AIAgentPlatformCore.zip"
+          # The release archive nests content under ai-agent-deployment-platform-vX.Y.Z/
+          SOLUTION="$(find artifact -maxdepth 4 -type f -path '*/powerplatform/exports/AIAgentPlatformCore.zip' | head -n 1)"
 
-          if [[ ! -f "$SOLUTION" ]]; then
-            echo "ERROR: Power Platform solution not found:"
-            echo "$SOLUTION"
+          if [[ -z "$SOLUTION" ]]; then
+            echo "ERROR: Power Platform solution not found under artifact/*/powerplatform/exports/"
             exit 1
           fi
 
