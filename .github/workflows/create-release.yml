@@ -4,9 +4,18 @@ on:
   push:
     tags:
       - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag to release (for example v1.0.1)"
+        required: true
+        type: string
 
 permissions:
   contents: write
+
+env:
+  RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
 
 jobs:
   release:
@@ -17,6 +26,7 @@ jobs:
       - name: Checkout tagged release
         uses: actions/checkout@v4
         with:
+          ref: ${{ env.RELEASE_TAG }}
           fetch-depth: 0
 
       - name: Read platform version
@@ -35,7 +45,7 @@ jobs:
       - name: Validate tag matches VERSION
         shell: bash
         run: |
-          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          TAG_VERSION="${RELEASE_TAG#v}"
           FILE_VERSION="${{ steps.version.outputs.version }}"
 
           echo "Git tag version: $TAG_VERSION"
@@ -109,11 +119,12 @@ jobs:
           MANIFEST="release/manifest.json"
 
           SHA256="$(awk '{print $1}' "$CHECKSUM_FILE")"
+          COMMIT_SHA="$(git rev-parse HEAD)"
 
           cat > "$MANIFEST" <<EOF
           {
             "version": "v${VERSION}",
-            "commit": "${GITHUB_SHA}",
+            "commit": "${COMMIT_SHA}",
             "artifact": "${ARTIFACT_NAME}.zip",
             "sha256": "${SHA256}",
             "created_at": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
@@ -138,7 +149,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           name: "AI Agent Deployment Platform v${{ steps.version.outputs.version }}"
-          tag_name: "${{ github.ref_name }}"
+          tag_name: "${{ env.RELEASE_TAG }}"
           generate_release_notes: true
           files: |
             release/ai-agent-deployment-platform-v${{ steps.version.outputs.version }}.zip
