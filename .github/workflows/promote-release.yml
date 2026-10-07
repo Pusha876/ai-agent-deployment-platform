@@ -64,15 +64,6 @@ jobs:
             --pattern "manifest.json" \
             --dir release
 
-      - name: Download checksum
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh release download "${{ inputs.version }}" \
-            --repo "${{ github.repository }}" \
-            --pattern "*.sha256" \
-            --dir release
-
       - name: Display release contents
         run: |
           echo "Release artifacts:"
