@@ -50,6 +50,12 @@ jobs:
     needs: validate-release
     runs-on: ubuntu-latest
 
+    outputs:
+      version: ${{ steps.release-metadata.outputs.version }}
+      commit: ${{ steps.release-metadata.outputs.commit }}
+      artifact: ${{ steps.release-metadata.outputs.artifact }}
+      sha256: ${{ steps.release-metadata.outputs.sha256 }}
+
     steps:
       - name: Download release archive
         env:
@@ -77,39 +83,63 @@ jobs:
           echo "SHA256 verification PASSED."
 
       - name: Verify release manifest
+        id: release-metadata
         working-directory: release
         run: |
-          VERSION=$(python -c "import json; print(json.load(open('manifest.json'))['version'])")
-          ARTIFACT=$(python -c "import json; print(json.load(open('manifest.json'))['artifact'])")
-          MANIFEST_SHA=$(python -c "import json; print(json.load(open('manifest.json'))['sha256'])")
+          python - <<'PY'
+          import json
+          import os
+          import hashlib
+          import sys
 
-          echo "Manifest version: $VERSION"
-          echo "Requested version: ${{ inputs.version }}"
-          echo "Artifact: $ARTIFACT"
-          echo "Manifest SHA-256: $MANIFEST_SHA"
+          with open("manifest.json", "r", encoding="utf-8") as f:
+              manifest = json.load(f)
 
-          if [[ "$VERSION" != "${{ inputs.version }}" ]]; then
-            echo "ERROR: Manifest version does not match requested release."
-            exit 1
-          fi
+          version = manifest["version"]
+          commit = manifest["commit"]
+          artifact = manifest["artifact"]
+          manifest_sha = manifest["sha256"]
 
-          if [[ ! -f "$ARTIFACT" ]]; then
-            echo "ERROR: Artifact referenced by manifest was not found."
-            exit 1
-          fi
+          requested_version = "${{ inputs.version }}"
 
-          ACTUAL_SHA=$(sha256sum "$ARTIFACT" | awk '{print $1}')
+          print(f"Manifest version:   {version}")
+          print(f"Requested version:  {requested_version}")
+          print(f"Commit:             {commit}")
+          print(f"Artifact:           {artifact}")
+          print(f"Manifest SHA-256:   {manifest_sha}")
 
-          if [[ "$ACTUAL_SHA" != "$MANIFEST_SHA" ]]; then
-            echo "ERROR: Artifact SHA-256 does not match manifest."
-            exit 1
-          fi
+          if version != requested_version:
+              print("ERROR: Manifest version does not match requested release.")
+              sys.exit(1)
 
-          echo "Release manifest verification PASSED."
+          if not os.path.isfile(artifact):
+              print(f"ERROR: Artifact not found: {artifact}")
+              sys.exit(1)
+
+          with open(artifact, "rb") as f:
+              actual_sha = hashlib.sha256(f.read()).hexdigest()
+
+          if actual_sha != manifest_sha:
+              print("ERROR: Artifact SHA-256 does not match manifest.")
+              print(f"Expected: {manifest_sha}")
+              print(f"Actual:   {actual_sha}")
+              sys.exit(1)
+
+          print("Release manifest verification PASSED.")
+
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+              output.write(f"version={version}\n")
+              output.write(f"commit={commit}\n")
+              output.write(f"artifact={artifact}\n")
+              output.write(f"sha256={manifest_sha}\n")
+          PY
 
   deploy-release:
     name: Deploy Verified Release
-    needs: download-release
+    needs:
+      - validate-release
+      - download-release
+
     runs-on: ubuntu-latest
 
     environment: ${{ inputs.environment }}
@@ -167,10 +197,15 @@ jobs:
       - name: Display deployment target
         run: |
           echo "========================================"
-          echo "DEPLOYING RELEASE"
+          echo "DEPLOYING VERIFIED RELEASE"
           echo "========================================"
-          echo "Version:     ${{ inputs.version }}"
-          echo "Environment: ${{ inputs.environment }}"
+          echo "Release:      ${{ needs.download-release.outputs.version }}"
+          echo "Environment:  ${{ inputs.environment }}"
+          echo "Commit:       ${{ needs.download-release.outputs.commit }}"
+          echo "Artifact:     ${{ needs.download-release.outputs.artifact }}"
+          echo "SHA-256:      ${{ needs.download-release.outputs.sha256 }}"
+          echo "Run ID:       ${{ github.run_id }}"
+          echo "Triggered by: ${{ github.actor }}"
           echo "========================================"
 
       - name: Install Power Platform CLI
@@ -190,10 +225,16 @@ jobs:
           echo "========================================"
           echo "RELEASE DEPLOYMENT SUMMARY"
           echo "========================================"
-          echo "Release:     ${{ inputs.version }}"
-          echo "Environment: ${{ inputs.environment }}"
+          echo "Release:       ${{ needs.download-release.outputs.version }}"
+          echo "Environment:   ${{ inputs.environment }}"
+          echo "Commit:        ${{ needs.download-release.outputs.commit }}"
+          echo "Artifact:      ${{ needs.download-release.outputs.artifact }}"
+          echo "SHA-256:       ${{ needs.download-release.outputs.sha256 }}"
+          echo "Run ID:        ${{ github.run_id }}"
+          echo "Triggered by:  ${{ github.actor }}"
           echo "========================================"
-          echo "Artifact:    Verified GitHub Release"
+          echo "Artifact:      VERIFIED"
+          echo "Deployment:    SUCCESS"
           echo "========================================"
 
   promotion-summary:
@@ -202,6 +243,7 @@ jobs:
     needs:
       - validate-release
       - download-release
+      - deploy-release
     runs-on: ubuntu-latest
 
     steps:
@@ -210,14 +252,22 @@ jobs:
           echo "========================================"
           echo "RELEASE PROMOTION SUMMARY"
           echo "========================================"
-          echo "Version:     ${{ inputs.version }}"
-          echo "Environment: ${{ inputs.environment }}"
-          echo "Validation:  ${{ needs.validate-release.result }}"
-          echo "Artifact:    ${{ needs.download-release.result }}"
+          echo "Release:       ${{ needs.download-release.outputs.version }}"
+          echo "Environment:   ${{ inputs.environment }}"
+          echo "Commit:        ${{ needs.download-release.outputs.commit }}"
+          echo "Artifact:      ${{ needs.download-release.outputs.artifact }}"
+          echo "SHA-256:       ${{ needs.download-release.outputs.sha256 }}"
+          echo "Run ID:        ${{ github.run_id }}"
+          echo "Triggered by:  ${{ github.actor }}"
+          echo "========================================"
+          echo "Validation:    ${{ needs.validate-release.result }}"
+          echo "Artifact:      ${{ needs.download-release.result }}"
+          echo "Deployment:    ${{ needs.deploy-release.result }}"
           echo "========================================"
 
           if [[ "${{ needs.validate-release.result }}" == "success" ]] && \
-             [[ "${{ needs.download-release.result }}" == "success" ]]; then
+             [[ "${{ needs.download-release.result }}" == "success" ]] && \
+             [[ "${{ needs.deploy-release.result }}" == "success" ]]; then
             echo "Overall Status: SUCCESS"
           else
             echo "Overall Status: FAILED"
