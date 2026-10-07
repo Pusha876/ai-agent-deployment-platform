@@ -99,6 +99,30 @@ jobs:
             "ai-agent-deployment-platform-v${{ steps.version.outputs.version }}.zip" \
             > "ai-agent-deployment-platform-v${{ steps.version.outputs.version }}.sha256"
 
+      - name: Generate release manifest
+        shell: bash
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          ARTIFACT_NAME="ai-agent-deployment-platform-v${VERSION}"
+          ARTIFACT="release/${ARTIFACT_NAME}.zip"
+          CHECKSUM_FILE="release/${ARTIFACT_NAME}.sha256"
+          MANIFEST="release/manifest.json"
+
+          SHA256="$(awk '{print $1}' "$CHECKSUM_FILE")"
+
+          cat > "$MANIFEST" <<EOF
+          {
+            "version": "v${VERSION}",
+            "commit": "${GITHUB_SHA}",
+            "artifact": "${ARTIFACT_NAME}.zip",
+            "sha256": "${SHA256}",
+            "created_at": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+          }
+          EOF
+
+          echo "Release manifest:"
+          cat "$MANIFEST"
+
       - name: Display release artifacts
         shell: bash
         run: |
@@ -107,6 +131,8 @@ jobs:
           echo ""
           echo "SHA-256:"
           cat "release/ai-agent-deployment-platform-v${{ steps.version.outputs.version }}.sha256"
+          echo "Release manifest:"
+          cat release/manifest.json
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -117,3 +143,4 @@ jobs:
           files: |
             release/ai-agent-deployment-platform-v${{ steps.version.outputs.version }}.zip
             release/ai-agent-deployment-platform-v${{ steps.version.outputs.version }}.sha256
+            release/manifest.json

@@ -60,6 +60,8 @@ jobs:
           gh release download "${{ inputs.version }}" \
             --repo "${{ github.repository }}" \
             --pattern "*.zip" \
+            --pattern "*.sha256" \
+            --pattern "manifest.json" \
             --dir release
 
       - name: Download checksum
@@ -82,6 +84,37 @@ jobs:
           sha256sum -c *.sha256
 
           echo "SHA256 verification PASSED."
+
+      - name: Verify release manifest
+        working-directory: release
+        run: |
+          VERSION=$(python -c "import json; print(json.load(open('manifest.json'))['version'])")
+          ARTIFACT=$(python -c "import json; print(json.load(open('manifest.json'))['artifact'])")
+          MANIFEST_SHA=$(python -c "import json; print(json.load(open('manifest.json'))['sha256'])")
+
+          echo "Manifest version: $VERSION"
+          echo "Requested version: ${{ inputs.version }}"
+          echo "Artifact: $ARTIFACT"
+          echo "Manifest SHA-256: $MANIFEST_SHA"
+
+          if [[ "$VERSION" != "${{ inputs.version }}" ]]; then
+            echo "ERROR: Manifest version does not match requested release."
+            exit 1
+          fi
+
+          if [[ ! -f "$ARTIFACT" ]]; then
+            echo "ERROR: Artifact referenced by manifest was not found."
+            exit 1
+          fi
+
+          ACTUAL_SHA=$(sha256sum "$ARTIFACT" | awk '{print $1}')
+
+          if [[ "$ACTUAL_SHA" != "$MANIFEST_SHA" ]]; then
+            echo "ERROR: Artifact SHA-256 does not match manifest."
+            exit 1
+          fi
+
+          echo "Release manifest verification PASSED."
 
   deploy-release:
     name: Deploy Verified Release
